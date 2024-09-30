@@ -19,29 +19,35 @@ class BarangController extends Controller
             'title' => 'Daftar Barang dalam sistem'
         ];
         $activeMenu = 'barang'; // Set menu yang sedang aktif
-
-        return view('barang.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'activeMenu' => $activeMenu]);
+        $kategori = KategoriModel::all();
+        return view('barang.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'kategori'=>$kategori,'activeMenu' => $activeMenu]);
     }
 
     // Ambil data barang dalam bentuk JSON untuk DataTables
     public function list(Request $request) 
-    { 
-        $barangs = BarangModel::with('kategori')->select('barang_id', 'barang_kode', 'barang_nama', 'harga_beli', 'harga_jual', 'kategori_id');
-        
-        return DataTables::of($barangs) 
-            ->addIndexColumn()  
-            ->addColumn('kategori', function ($barang) {
-                return $barang->kategori ? $barang->kategori->kategori_nama : '-';
-            })
-            ->addColumn('aksi', function ($barang) {
-                $btn  = '<a href="'.url('/barang/' . $barang->barang_id).'" class="btn btn-info btn-sm">Detail</a> ';
-                $btn .= '<a href="'.url('/barang/' . $barang->barang_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<form class="d-inline-block" method="POST" action="'.url('/barang/'.$barang->barang_id).'">'.csrf_field().method_field('DELETE') .'<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';      
-                return $btn; 
-            }) 
-            ->rawColumns(['aksi']) // memberitahu bahwa kolom aksi adalah HTML
-            ->make(true); 
+{ 
+    $barangs = BarangModel::with('kategori')->select('barang_id', 'barang_kode', 'barang_nama', 'harga_beli', 'harga_jual', 'kategori_id');
+
+    // Jika kategori_id ada dalam permintaan, filter berdasarkan kategori
+    if ($request->has('kategori_id') && $request->kategori_id != '') {
+        $barangs->where('kategori_id', $request->kategori_id);
     }
+
+    return DataTables::of($barangs) 
+        ->addIndexColumn()  
+        ->addColumn('kategori', function ($barang) {
+            return $barang->kategori ? $barang->kategori->kategori_nama : '-';
+        })
+        ->addColumn('aksi', function ($barang) {
+            $btn  = '<a href="'.url('/barang/' . $barang->barang_id).'" class="btn btn-info btn-sm">Detail</a> ';
+            $btn .= '<a href="'.url('/barang/' . $barang->barang_id . '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
+            $btn .= '<form class="d-inline-block" method="POST" action="'.url('/barang/'.$barang->barang_id).'">'.csrf_field().method_field('DELETE') .'<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin menghapus data ini?\');">Hapus</button></form>';      
+            return $btn; 
+        }) 
+        ->rawColumns(['aksi']) 
+        ->make(true); 
+}
+
 
     public function create() 
     {

@@ -16,6 +16,18 @@
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
             
+            <div class="form-group row">
+                <label class="col-sm-1 col-form-label">Kategori:</label>
+                <div class="col-sm-3">
+                    <select class="form-control" id="kategori_filter">
+                        <option value="">- Semua Kategori -</option>
+                        @foreach ($kategori as $item)
+                            <option value="{{ $item->kategori_id }}">{{ $item->kategori_nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             <table class="table table-bordered table-striped table-hover table-sm" id="table-barang">
                 <thead>
                     <tr>
@@ -37,57 +49,64 @@
     <script>
         $(document).ready(function() {
             var dataBarang = $('#table-barang').DataTable({
-                // serverSide: true for server-side processing
                 serverSide: true,      
                 ajax: { 
                     "url": "{{ url('barang/list') }}",  // URL untuk mengambil data
                     "type": "POST", 
-                    "dataType": "json"
+                    "dataType": "json",
+                    "data": function (d) {
+                        d.kategori_id = $('#kategori_filter').val(); // Mengirim nilai kategori yang dipilih
+                    }
                 }, 
                 columns: [ 
                     {
-                        data: "DT_RowIndex", // Nomor urut otomatis dari DataTables
+                        data: "DT_RowIndex",
                         className: "text-center", 
                         orderable: false, 
                         searchable: false     
                     },
                     { 
-                        data: "barang_kode",  // Kode Barang
+                        data: "barang_kode",
                         className: "", 
                         orderable: true,     
                         searchable: true     
                     },
                     { 
-                        data: "barang_nama",  // Nama Barang
+                        data: "barang_nama",
                         className: "", 
                         orderable: true,     
                         searchable: true     
                     },
                     { 
-                        data: "kategori",  // Kategori Barang (hubungan ke KategoriModel)
+                        data: "kategori",  
                         className: "", 
                         orderable: true,     
                         searchable: true     
                     },
                     { 
-                        data: "harga_beli",  // Harga Beli
+                        data: "harga_beli",
                         className: "", 
                         orderable: true,     
                         searchable: true     
                     },
                     { 
-                        data: "harga_jual",  // Harga Jual
+                        data: "harga_jual",
                         className: "", 
                         orderable: true,     
                         searchable: true     
                     },
                     { 
-                        data: "aksi",  // Kolom aksi untuk tombol Edit dan Hapus
+                        data: "aksi",
                         className: "", 
                         orderable: false,     
                         searchable: false     
                     } 
                 ]
+            });
+
+            // Mengatur event ketika kategori dipilih
+            $('#kategori_filter').on('change', function(){
+                dataBarang.ajax.reload(); // Reload data setelah memilih kategori
             });
         });
     </script>
