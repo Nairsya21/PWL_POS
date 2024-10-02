@@ -46,7 +46,7 @@
 @push('css')
 @endpush
 
-@push('js') 
+@push('js') l
   <script> 
   function modalAction(url = ''){ 
     $('#myModal').load(url,function(){ 
