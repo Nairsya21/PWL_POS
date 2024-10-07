@@ -10,15 +10,6 @@
     <div class="card-body">
         Selamat datang semua, ini adalah halaman utama dari aplikasi ini.
     </div>
-    <a href="{{ url('logout') }}" 
-   class="nav-link"
-   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-   Logout
-</a>
-
-<form id="logout-form" action="{{ url('logout') }}" method="GET" style="display: none;">
-    @csrf
-</form>
 
 </div>
 @endsection
