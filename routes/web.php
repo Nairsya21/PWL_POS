@@ -57,25 +57,28 @@ Route::pattern('id', '[0-9]+');
             Route::put('/{id}', [UserController::class, 'update']);     //menyimpan perubahan data user
             Route::delete('/{id}', [UserController::class, 'destroy']); //menghapus data user
         });
-        Route::group(['prefix'=> 'level'], function(){
-            Route::get('/', [LevelController::class, 'index']);          //menampilkan halaman awal Level
-            Route::post('/list', [LevelController::class, 'list']);      //menampilkan data Level dalam bentuk json untuk datatables
-            Route::get('/create', [LevelController::class, 'create']);   //menammpilkan halaman form tambah Level
-            Route::post('/', [LevelController::class, 'store']);         //menyimpan data Level baru
-        
-            Route::get('/create_ajax', [LevelController::class, 'create_ajax']);  //menampilkan halaman form tambah Level Ajax
-            Route::post('/ajax', [LevelController::class, 'store_ajax']);         //menyimpan data Level baru Ajax
-            Route::get('/{id}/edit_ajax', [LevelController::class, 'edit_ajax']);  //menampilkan halaman form edit Level Ajax
-            Route::put('/{id}/update_ajax', [LevelController::class, 'update_ajax']);  //Menyimpan halaman form edit Level Ajax
-            Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);  //tampilan form confirm delete Level Ajax
-            Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); //menghapus data Level Ajax
+        Route::middleware(['authorize:ADM'])->group(function(){
+            Route::group(['prefix'=> 'level'], function(){
+                Route::get('/', [LevelController::class, 'index']);          //menampilkan halaman awal Level
+                Route::post('/list', [LevelController::class, 'list']);      //menampilkan data Level dalam bentuk json untuk datatables
+                Route::get('/create', [LevelController::class, 'create']);   //menammpilkan halaman form tambah Level
+                Route::post('/', [LevelController::class, 'store']);         //menyimpan data Level baru
             
-            Route::get('/{id}', [LevelController::class, 'show']);       //menampilkan detail Level
-            Route::get('/{id}/edit', [LevelController::class, 'edit']);  //menampilkan halaman form detail Level
-            Route::put('/{id}', [LevelController::class, 'update']);     //menyimpan perubahan data Level
-            Route::delete('/{id}', [LevelController::class, 'destroy']); //menghapus data level
-            
+                Route::get('/create_ajax', [LevelController::class, 'create_ajax']);  //menampilkan halaman form tambah Level Ajax
+                Route::post('/ajax', [LevelController::class, 'store_ajax']);         //menyimpan data Level baru Ajax
+                Route::get('/{id}/edit_ajax', [LevelController::class, 'edit_ajax']);  //menampilkan halaman form edit Level Ajax
+                Route::put('/{id}/update_ajax', [LevelController::class, 'update_ajax']);  //Menyimpan halaman form edit Level Ajax
+                Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);  //tampilan form confirm delete Level Ajax
+                Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); //menghapus data Level Ajax
+                
+                Route::get('/{id}', [LevelController::class, 'show']);       //menampilkan detail Level
+                Route::get('/{id}/edit', [LevelController::class, 'edit']);  //menampilkan halaman form detail Level
+                Route::put('/{id}', [LevelController::class, 'update']);     //menyimpan perubahan data Level
+                Route::delete('/{id}', [LevelController::class, 'destroy']); //menghapus data level
+                
+            });
         });
+        
         Route::group(['prefix'=> 'kategori'], function(){
             Route::get('/', [KategoriController::class, 'index']);          //menampilkan halaman awal Kategori
             Route::post('/list', [KategoriController::class, 'list']);      //menampilkan data Kategori dalam bentuk json untuk datatables
