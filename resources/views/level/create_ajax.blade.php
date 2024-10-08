@@ -51,10 +51,11 @@
                             $.each(response.msgField, function(prefix, val) {
                                 $('#error-' + prefix).text(val[0]);
                             });
+                            console.log(xhr.responseText);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Terjadi Kesalahan',
-                                text: response.message
+                                text: 'Kesalahan di server: ' + xhr.responseText
                             });
                         }
                     }
