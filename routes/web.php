@@ -34,9 +34,11 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
 Route::pattern('id', '[0-9]+');
-    Route::get('login', [AuthController::class, 'login'])->name('login');
-    Route::post('login', [AuthController::class, 'postlogin']);
-    Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::get('login', [AuthController::class, 'login'])->name('login');
+Route::post('login', [AuthController::class, 'postlogin']);
+Route::post('logout', [AuthController::class, 'logout'])->middleware('auth');
+Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
 
     Route::middleware(['auth'])->group(function(){
         Route::get('/', [WelcomeController::class, 'index']);

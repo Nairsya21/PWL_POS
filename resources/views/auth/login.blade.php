@@ -59,6 +59,11 @@ placeholder="Password">
 <div class="col-4">
 <button type="submit" class="btn btn-primary btn-block">Sign In</button>
 </div>
+<div class="mt-3">
+    <p>Don't have an account? 
+        <a href="{{ url('/register') }}" class="btn btn-primary">Register</a>
+    </p>
+</div>
 <!-- /.col -->
 </div>
 </form>
