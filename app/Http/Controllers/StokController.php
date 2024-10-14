@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\StokModel;
 use App\Models\SupplierModel;
@@ -27,8 +28,8 @@ class StokController extends Controller
         $users = UserModel::all();
 
         return view('stok.index', [
-            'breadcrumb' => $breadcrumb, 
-            'page' => $page, 
+            'breadcrumb' => $breadcrumb,
+            'page' => $page,
             'suppliers' => $suppliers,
             'barangs' => $barangs,
             'users' => $users,
@@ -44,9 +45,9 @@ class StokController extends Controller
         return DataTables::of($stocks)
             ->addIndexColumn()
             ->addColumn('aksi', function ($stock) {
-                $btn  = '<button onclick="modalAction(\''.url('/stok/' . $stock->stok_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/stok/' . $stock->stok_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/stok/' . $stock->stok_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                $btn  = '<button onclick="modalAction(\'' . url('/stok/' . $stock->stok_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stock->stok_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stock->stok_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
                 return $btn;
             })
             ->rawColumns(['aksi'])
@@ -68,10 +69,10 @@ class StokController extends Controller
         $users = UserModel::all();
 
         return view('stok.create', [
-            'breadcrumb' => $breadcrumb, 
-            'page' => $page, 
-            'suppliers' => $suppliers, 
-            'barangs' => $barangs, 
+            'breadcrumb' => $breadcrumb,
+            'page' => $page,
+            'suppliers' => $suppliers,
+            'barangs' => $barangs,
             'users' => $users,
             'activeMenu' => $activeMenu
         ]);
@@ -137,11 +138,11 @@ class StokController extends Controller
         $users = UserModel::all();
 
         return view('stok.edit', [
-            'breadcrumb' => $breadcrumb, 
-            'page' => $page, 
-            'stock' => $stock, 
-            'suppliers' => $suppliers, 
-            'barangs' => $barangs, 
+            'breadcrumb' => $breadcrumb,
+            'page' => $page,
+            'stock' => $stock,
+            'suppliers' => $suppliers,
+            'barangs' => $barangs,
             'users' => $users,
             'activeMenu' => $activeMenu
         ]);
@@ -196,7 +197,7 @@ class StokController extends Controller
     }
 
     // Store a newly created item via AJAX
-    public function store_ajax(Request $request) 
+    public function store_ajax(Request $request)
     {
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
@@ -227,7 +228,7 @@ class StokController extends Controller
     }
 
     // Display the form for editing an item via AJAX
-    public function edit_ajax(string $id) 
+    public function edit_ajax(string $id)
     {
         $stock = StokModel::find($id);
         $suppliers = SupplierModel::select('supplier_id', 'supplier_nama')->get();
@@ -236,8 +237,8 @@ class StokController extends Controller
     }
 
     // Update an existing item via AJAX
-    public function update_ajax(Request $request, $id) 
-    { 
+    public function update_ajax(Request $request, $id)
+    {
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'supplier_id' => 'required|integer|exists:m_supplier,supplier_id',
@@ -274,18 +275,20 @@ class StokController extends Controller
         }
         return redirect('/');
     }
-    public function confirm_ajax(string $id) {
+    public function confirm_ajax(string $id)
+    {
         $stok = StokModel::find($id);
 
         return view('stok.confirm_ajax', ['stok' => $stok]);
     }
 
     // Deleting Supplier via AJAX
-    public function delete_ajax(Request $request, $id) {
-        if($request->ajax() || $request->wantsJson()) {
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
             $stok = StokModel::find($id);
 
-            if($stok) {
+            if ($stok) {
                 $stok->delete();
 
                 return response()->json([
@@ -301,5 +304,21 @@ class StokController extends Controller
         }
 
         return redirect('/');
+    }
+    public function export_pdf()
+    {
+        $stok = StokModel::select('stok_id', 'supplier_id', 'barang_id', 'user_id', 'stok_tanggal', 'stok_jumlah')
+            ->orderBy('stok_id')
+            ->with('supplier')
+            ->with('barang')
+            ->with('user')
+            ->get();
+
+        $pdf = Pdf::loadView('stok.export_pdf', ['stok' => $stok]);
+        $pdf->setPaper('a4', 'portrait'); //set ukuran kertas dan orientasi
+        $pdf->setOption("isRemoteEnabled", true); //set true jika ada gambar dari url
+        $pdf->render();
+
+        return $pdf->stream('Data stok ' . date('Y-m-d H:i:s') . 'pdf');
     }
 }

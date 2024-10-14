@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SupplierModel; 
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\SupplierModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -24,23 +25,23 @@ class SupplierController extends Controller
     }
 
     // Ambil data supplier dalam bentuk json untuk datatables 
-    public function list(Request $request) 
-    { 
+    public function list(Request $request)
+    {
         $suppliers = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat');
-        
-        return DataTables::of($suppliers) 
-            ->addIndexColumn()  
-            ->addColumn('aksi', function ($supplier) { 
-                $btn  = '<button onclick="modalAction(\''.url('/supplier/' . $supplier->supplier_id . '/show_ajax').'\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\''.url('/supplier/' . $supplier->supplier_id . '/edit_ajax').'\')" class="btn btn-warning btn-sm">Edit</button> '; 
-                $btn .= '<button onclick="modalAction(\''.url('/supplier/' . $supplier->supplier_id . '/delete_ajax').'\')" class="btn btn-danger btn-sm">Hapus</button> '; 
-                return $btn; 
-            }) 
-            ->rawColumns(['aksi']) 
-            ->make(true); 
+
+        return DataTables::of($suppliers)
+            ->addIndexColumn()
+            ->addColumn('aksi', function ($supplier) {
+                $btn  = '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/supplier/' . $supplier->supplier_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
     }
-    
-    public function create() 
+
+    public function create()
     {
         $breadcrumb = (object) [
             'title' => 'Tambah Supplier',
@@ -61,7 +62,7 @@ class SupplierController extends Controller
             'supplier_nama' => 'required|string|max:100',
             'supplier_alamat' => 'nullable|string|max:255',
         ]);
-        
+
         SupplierModel::create([
             'supplier_kode' => $request->supplier_kode,
             'supplier_nama' => $request->supplier_nama,
@@ -77,7 +78,7 @@ class SupplierController extends Controller
         if (!$supplier) {
             return redirect('/supplier')->with('error', 'Data supplier tidak ditemukan');
         }
-        
+
         $breadcrumb = (object)[
             'title' => 'Detail Supplier',
             'list' => ['Home', 'Supplier', 'Detail']
@@ -117,11 +118,11 @@ class SupplierController extends Controller
         }
 
         $request->validate([
-            'supplier_kode' => 'required|string|max:10|unique:m_supplier,supplier_kode,'.$id.',supplier_id',
+            'supplier_kode' => 'required|string|max:10|unique:m_supplier,supplier_kode,' . $id . ',supplier_id',
             'supplier_nama' => 'required|string|max:100',
             'supplier_alamat' => 'nullable|string|max:255',
         ]);
-        
+
         $supplier->update([
             'supplier_kode' => $request->supplier_kode,
             'supplier_nama' => $request->supplier_nama,
@@ -146,13 +147,15 @@ class SupplierController extends Controller
         }
     }
 
-    public function create_ajax() {
+    public function create_ajax()
+    {
         return view('supplier.create_ajax');
     }
 
     // Storing new Supplier via AJAX
-    public function store_ajax(Request $request) {
-        if($request->ajax() || $request->wantsJson()) {
+    public function store_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'supplier_nama' => 'required|string|min:3|unique:m_supplier,supplier_nama',
                 'supplier_kode' => 'required|string|min:2|unique:m_supplier,supplier_kode',
@@ -161,7 +164,7 @@ class SupplierController extends Controller
 
             $validator = Validator::make($request->all(), $rules);
 
-            if($validator->fails()) {
+            if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Validasi Gagal',
@@ -181,24 +184,26 @@ class SupplierController extends Controller
     }
 
     // Displaying edit form for Supplier via AJAX
-    public function edit_ajax(string $id) {
+    public function edit_ajax(string $id)
+    {
         $supplier = SupplierModel::find($id);
 
         return view('supplier.edit_ajax', ['supplier' => $supplier]);
     }
 
     // Updating Supplier via AJAX
-    public function update_ajax(Request $request, $id) {
-        if($request->ajax() || $request->wantsJson()) {
+    public function update_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'supplier_nama' => 'required|string|max:100|unique:m_supplier,supplier_nama,'.$id.',supplier_id',
-                'supplier_kode' => 'required|string|max:10|unique:m_supplier,supplier_kode,'.$id.',supplier_id',
+                'supplier_nama' => 'required|string|max:100|unique:m_supplier,supplier_nama,' . $id . ',supplier_id',
+                'supplier_kode' => 'required|string|max:10|unique:m_supplier,supplier_kode,' . $id . ',supplier_id',
                 'supplier_alamat' => 'nullable|string|max:255',
             ];
 
             $validator = Validator::make($request->all(), $rules);
 
-            if($validator->fails()) {
+            if ($validator->fails()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Validasi Gagal',
@@ -207,7 +212,7 @@ class SupplierController extends Controller
             }
 
             $supplier = SupplierModel::find($id);
-            if($supplier) {
+            if ($supplier) {
                 $supplier->update($request->all());
 
                 return response()->json([
@@ -226,18 +231,20 @@ class SupplierController extends Controller
     }
 
     // Confirming Supplier deletion via AJAX
-    public function confirm_ajax(string $id) {
+    public function confirm_ajax(string $id)
+    {
         $supplier = SupplierModel::find($id);
 
         return view('supplier.confirm_ajax', ['supplier' => $supplier]);
     }
 
     // Deleting Supplier via AJAX
-    public function delete_ajax(Request $request, $id) {
-        if($request->ajax() || $request->wantsJson()) {
+    public function delete_ajax(Request $request, $id)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
             $supplier = SupplierModel::find($id);
 
-            if($supplier) {
+            if ($supplier) {
                 $supplier->delete();
 
                 return response()->json([
@@ -253,5 +260,19 @@ class SupplierController extends Controller
         }
 
         return redirect('/');
+    }
+    public function export_pdf()
+    {
+        $supplier = SupplierModel::select('supplier_id', 'supplier_kode', 'supplier_nama', 'supplier_alamat')
+            ->orderBy('supplier_id')
+            ->orderBy('supplier_kode')
+            ->get();
+
+        $pdf = Pdf::loadView('supplier.export_pdf', ['supplier' => $supplier]);
+        $pdf->setPaper('a4', 'portrait'); //set ukuran kertas dan orientasi
+        $pdf->setOption("isRemoteEnabled", true); //set true jika ada gambar dari url
+        $pdf->render();
+
+        return $pdf->stream('Data supplier ' . date('Y-m-d H:i:s') . 'pdf');
     }
 }

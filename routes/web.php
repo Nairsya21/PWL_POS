@@ -55,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}/update_ajax', [UserController::class, 'update_ajax']);  //Menyimpan halaman form edit user Ajax
         Route::get('/{id}/delete_ajax', [UserController::class, 'confirm_ajax']);  //tampilan form confirm delete user Ajax
         Route::delete('/{id}/delete_ajax', [UserController::class, 'delete_ajax']); //menghapus data user Ajax
+        Route::get('/export_pdf', [UserController::class, 'export_pdf']);  //export pdf
 
         Route::get('/{id}', [UserController::class, 'show']);       //menampilkan detail user
         Route::get('/{id}/edit', [UserController::class, 'edit']);  //menampilkan halaman form detail user
@@ -73,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}/update_ajax', [LevelController::class, 'update_ajax']);  //Menyimpan halaman form edit Level Ajax
         Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);  //tampilan form confirm delete Level Ajax
         Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); //menghapus data Level Ajax
+        Route::get('/export_pdf', [LevelController::class, 'export_pdf']);  //export pdf
 
         Route::get('/{id}', [LevelController::class, 'show']);       //menampilkan detail Level
         Route::get('/{id}/edit', [LevelController::class, 'edit']);  //menampilkan halaman form detail Level
@@ -93,7 +95,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}/update_ajax', [KategoriController::class, 'update_ajax']);  //Menyimpan halaman form edit Kategori Ajax
         Route::get('/{id}/delete_ajax', [KategoriController::class, 'confirm_ajax']);  //tampilan form confirm delete Kategori Ajax
         Route::delete('/{id}/delete_ajax', [KategoriController::class, 'delete_ajax']); //menghapus data Kategori Ajax
-
+        Route::get('/export_pdf', [KategoriController::class, 'export_pdf']);  //export pdf
 
         Route::get('/{id}', [KategoriController::class, 'show']);       //menampilkan detail Kategori
         Route::get('/{id}/edit', [KategoriController::class, 'edit']);  //menampilkan halaman form detail Kategori
@@ -138,6 +140,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}/update_ajax', [SupplierController::class, 'update_ajax']);  //Menyimpan halaman form edit Supplier Ajax
         Route::get('/{id}/delete_ajax', [SupplierController::class, 'confirm_ajax']);  //tampilan form confirm delete Supplier Ajax
         Route::delete('/{id}/delete_ajax', [SupplierController::class, 'delete_ajax']); //menghapus data Supplier Ajax
+        Route::get('/export_pdf', [SupplierController::class, 'export_pdf']);  //export pdf
 
 
         Route::get('/{id}', [SupplierController::class, 'show']);       //menampilkan detail Supplier
@@ -158,6 +161,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}/update_ajax', [StokController::class, 'update_ajax']);  //Menyimpan halaman form edit Stok Ajax
         Route::get('/{id}/delete_ajax', [StokController::class, 'confirm_ajax']);  //tampilan form confirm delete Stok Ajax
         Route::delete('/{id}/delete_ajax', [StokController::class, 'delete_ajax']); //menghapus data Stok Ajax
+        Route::get('/export_pdf', [StokController::class, 'export_pdf']);  //export pdf
 
 
         Route::get('/{id}', [StokController::class, 'show']);       //menampilkan detail Stok
@@ -180,6 +184,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}/update_ajax', [PenjualanController::class, 'update_ajax']);  //Menyimpan halaman form edit Penjualan Ajax
         Route::get('/{id}/delete_ajax', [PenjualanController::class, 'confirm_ajax']);  //tampilan form confirm delete Penjualan Ajax
         Route::delete('/{id}/delete_ajax', [PenjualanController::class, 'delete_ajax']); //menghapus data Penjualan Ajax
+        Route::get('/export_pdf', [PenjualanController::class, 'export_pdf']);  //export pdf
 
 
         Route::get('/{id}', [PenjualanController::class, 'show']);       //menampilkan detail Penjualan
