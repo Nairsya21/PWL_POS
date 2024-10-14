@@ -8,7 +8,7 @@
   <div class="card-body"> 
     <form method="POST" action="{{ url('stok') }}" class="form-horizontal"> 
       @csrf 
-      
+      <input type="hidden" name="user_id" value="{{ auth()->id() }}"> 
       <div class="form-group row"> 
         <label class="col-1 control-label col-form-label">Barang</label> 
         <div class="col-11"> 

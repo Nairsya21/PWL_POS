@@ -274,36 +274,32 @@ class StokController extends Controller
         }
         return redirect('/');
     }
+    public function confirm_ajax(string $id) {
+        $stok = StokModel::find($id);
 
-    // Confirm deletion of an item via AJAX
-    public function confirm_ajax(string $id) 
-    {
-        $stock = StokModel::find($id);
-        return response()->json($stock);
+        return view('stok.confirm_ajax', ['stok' => $stok]);
     }
 
-    // Delete an existing item via AJAX
-    public function delete_ajax(string $id) 
-    {
-        $stock = StokModel::find($id);
-        if (!$stock) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data stok tidak ditemukan'
-            ]);
+    // Deleting Supplier via AJAX
+    public function delete_ajax(Request $request, $id) {
+        if($request->ajax() || $request->wantsJson()) {
+            $stok = StokModel::find($id);
+
+            if($stok) {
+                $stok->delete();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data stok berhasil dihapus'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
         }
 
-        try {
-            $stock->delete();
-            return response()->json([
-                'status' => true,
-                'message' => 'Data stok berhasil dihapus'
-            ]);
-        } catch (\Illuminate\Database\QueryException $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data stok gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
-            ]);
-        }
+        return redirect('/');
     }
 }

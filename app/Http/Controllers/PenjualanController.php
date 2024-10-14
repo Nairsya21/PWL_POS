@@ -7,6 +7,7 @@ use App\Models\PenjualanModel;
 use App\Models\UserModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class PenjualanController extends Controller
 {
@@ -155,7 +156,7 @@ class PenjualanController extends Controller
     }
 
     public function create_ajax() {
-        $users = UserModel::select('user_id', 'name')->get();
+        $users = UserModel::select('user_id', 'nama')->get();
         return view('penjualan.create_ajax')->with('users', $users);
     }
 
@@ -192,8 +193,7 @@ class PenjualanController extends Controller
     // Display the form for editing an item via AJAX
     public function edit_ajax(string $id) {
         $penjualan = PenjualanModel::find($id);
-        $users = UserModel::select('user_id', 'name')->get();
-        return view('penjualan.edit_ajax', ['penjualan' => $penjualan, 'users' => $users]);
+        return view('penjualan.edit_ajax', ['penjualan' => $penjualan]);
     }
 
     // Update an existing item via AJAX
@@ -232,29 +232,28 @@ class PenjualanController extends Controller
             ]); 
         } 
     }
-    
-        // Delete an existing item via AJAX
-        public function delete_ajax(string $id) {
-            $penjualan = PenjualanModel::find($id);
-            if (!$penjualan) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data penjualan tidak ditemukan.'
-                ]);
+    public function confirm_ajax(string $id) {
+        $penjualan = PenjualanModel::find($id);
+        return view('penjualan.confirm_ajax', ['penjualan' => $penjualan]);
+    }
+        public function delete_ajax(Request $request, $id) {
+            // Check if the request is an AJAX request
+            if ($request->ajax() || $request->wantsJson()) {
+                $penjualan = PenjualanModel::find($id);
+                if ($penjualan) {
+                    $penjualan->delete();
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data berhasil dihapus'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Data tidak ditemukan'
+                    ]);
+                }
             }
-    
-            try {
-                $penjualan->delete();
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data penjualan berhasil dihapus.'
-                ]);
-            } catch (\Illuminate\Database\QueryException $e) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data penjualan gagal dihapus karena masih terdapat tabel lain yang terkait dengan data ini.'
-                ]);
-            }
+            return redirect('/');
         }
     }
     
