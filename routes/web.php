@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\UserController;
@@ -195,4 +196,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     });
+
+    Route::get('/profil', [ProfilController::class, 'index']);
+    Route::post('/profil/update', [ProfilController::class, 'update']);
 });
