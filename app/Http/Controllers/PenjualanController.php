@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\PenjualanModel;
+use App\Models\DetailPenjualanModel;
+use App\Models\BarangModel;
 use App\Models\UserModel;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
@@ -161,7 +163,22 @@ class PenjualanController extends Controller
         $users = UserModel::select('user_id', 'nama')->get();
         return view('penjualan.create_ajax')->with('users', $users);
     }
+    public function show_ajax(string $id)
+    {
+        // Mengambil data penjualan berdasarkan id
+        $penjualan = PenjualanModel::findOrFail($id);
 
+        // Mengambil detail penjualan berdasarkan penjualan_id
+        $details = DetailPenjualanModel::where('penjualan_id', $id)->with('barang')->get();
+
+        // $barangs = BarangModel::find($details->barang_id);
+        // Mengirimkan data ke view untuk di-load menggunakan DataTables
+        return view('penjualan.show_ajax', [
+            'penjualan' => $penjualan,
+            // 'barangs' => $barangs,
+            'details' => $details
+        ]);
+    }
     // Store a newly created item via AJAX
     public function store_ajax(Request $request)
     {

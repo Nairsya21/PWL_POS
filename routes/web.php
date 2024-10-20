@@ -186,8 +186,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/{id}/update_ajax', [PenjualanController::class, 'update_ajax']);  //Menyimpan halaman form edit Penjualan Ajax
         Route::get('/{id}/delete_ajax', [PenjualanController::class, 'confirm_ajax']);  //tampilan form confirm delete Penjualan Ajax
         Route::delete('/{id}/delete_ajax', [PenjualanController::class, 'delete_ajax']); //menghapus data Penjualan Ajax
+        Route::get('/{id}/show_ajax', [PenjualanController::class, 'show_ajax']);
         Route::get('/export_pdf', [PenjualanController::class, 'export_pdf']);  //export pdf
-
 
         Route::get('/{id}', [PenjualanController::class, 'show']);       //menampilkan detail Penjualan
         Route::get('/{id}/edit', [PenjualanController::class, 'edit']);  //menampilkan halaman form detail Penjualan
