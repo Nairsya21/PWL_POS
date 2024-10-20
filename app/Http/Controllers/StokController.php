@@ -195,6 +195,13 @@ class StokController extends Controller
         $barangs = BarangModel::select('barang_id', 'barang_nama')->get();
         return view('stok.create_ajax', ['suppliers' => $suppliers, 'barangs' => $barangs]);
     }
+    public function show_ajax(string $id)
+    {
+        $stock = StokModel::findOrFail($id);
+        $suppliers = SupplierModel::find($stock->supplier_id);
+        $barangs = BarangModel::find($stock->barang_id);
+        return view('stok.show_ajax', ['suppliers' => $suppliers, 'barangs' => $barangs, 'stock' => $stock]);
+    }
 
     // Store a newly created item via AJAX
     public function store_ajax(Request $request)

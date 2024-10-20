@@ -159,6 +159,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/create_ajax', [StokController::class, 'create_ajax']);  //menampilkan halaman form tambah Stok Ajax
         Route::post('/ajax', [StokController::class, 'store_ajax']);         //menyimpan data Stok baru Ajax
         Route::get('/{id}/edit_ajax', [StokController::class, 'edit_ajax']);  //menampilkan halaman form edit Stok Ajax
+        Route::get('/{id}/show_ajax', [StokController::class, 'show_ajax']);  //menampilkan halaman form edit Stok Ajax
         Route::put('/{id}/update_ajax', [StokController::class, 'update_ajax']);  //Menyimpan halaman form edit Stok Ajax
         Route::get('/{id}/delete_ajax', [StokController::class, 'confirm_ajax']);  //tampilan form confirm delete Stok Ajax
         Route::delete('/{id}/delete_ajax', [StokController::class, 'delete_ajax']); //menghapus data Stok Ajax
@@ -199,4 +200,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/profil', [ProfilController::class, 'index']);
     Route::post('/profil/update', [ProfilController::class, 'update']);
+    Route::post('/profil/update_data_diri', [ProfilController::class, 'updateDataDiri']);
+    Route::post('/profil/update_password', [ProfilController::class, 'updatePassword']);
 });
