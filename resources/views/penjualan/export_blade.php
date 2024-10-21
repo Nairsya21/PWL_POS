@@ -1,6 +1,6 @@
-<form action="{{ url('/level/import_ajax') }}" method="POST" id="form-import-level" enctype="multipart/form-data">
+<form action="{{ url('/level/import_ajax') }}" method="POST" id="form-import" enctype="multipart/form-data">
     @csrf
-    <div id="modal-level" class="modal-dialog modal-lg" role="document">
+    <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Import Data Level</h5>
@@ -14,7 +14,7 @@
                     <a href="{{ asset('template_level.xlsx') }}" class="btn btn-info btn-sm" download>
                         <i class="fa fa-file-excel"></i> Download
                     </a>
-                    <small id="error-template" class="error-text form-text text-danger"></small>
+                    <small id="error-level_id" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Pilih File</label>
@@ -32,7 +32,7 @@
 
 <script>
     $(document).ready(function() {
-        $("#form-import-level").validate({
+        $("#form-import").validate({
             rules: {
                 file_level: {
                     required: true,
@@ -40,30 +40,30 @@
                 },
             },
             submitHandler: function(form) {
-                var formData = new FormData(form); // Handle file using FormData
+                var formData = new FormData(form); // Handle file upload via FormData
                 $.ajax({
                     url: form.action,
                     type: form.method,
-                    data: formData, // Send FormData to handle file
-                    processData: false, // Do not process data
-                    contentType: false, // Do not set contentType
+                    data: formData,
+                    processData: false,
+                    contentType: false,
                     success: function(response) {
-                        if (response.status) { // if success
-                            $('#modal-level').modal('hide');
+                        if (response.status) { // Success handling
+                            $('#myModal').modal('hide');
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Berhasil',
+                                title: 'Success',
                                 text: response.message
                             });
-                            tableLevel.ajax.reload(); // Reload datatable
-                        } else { // if error
+                            tableLevel.ajax.reload(); // Reload table
+                        } else { // Error handling
                             $('.error-text').text('');
                             $.each(response.msgField, function(prefix, val) {
                                 $('#error-' + prefix).text(val[0]);
                             });
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Terjadi Kesalahan',
+                                title: 'Error',
                                 text: response.message
                             });
                         }

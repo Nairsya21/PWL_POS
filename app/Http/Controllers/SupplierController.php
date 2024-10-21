@@ -7,6 +7,8 @@ use App\Models\SupplierModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 class SupplierController extends Controller
 {
@@ -151,6 +153,16 @@ class SupplierController extends Controller
     {
         return view('supplier.create_ajax');
     }
+    public function show_ajax(Request $request, string $id)
+    {
+        $supplier = SupplierModel::find($id);
+        // if (!$supplier) {
+        //     return response()->json(['error' => 'Data level tidak ditemukan'], 404);
+        // }
+
+        return view('supplier.show_ajax', compact('supplier'));
+    }
+
 
     // Storing new Supplier via AJAX
     public function store_ajax(Request $request)
@@ -274,5 +286,111 @@ class SupplierController extends Controller
         $pdf->render();
 
         return $pdf->stream('Data supplier ' . date('Y-m-d H:i:s') . 'pdf');
+    }
+    public function import()
+    {
+        return view('supplier.import');
+    }
+    public function export_excel()
+    {
+        $suppliers = SupplierModel::orderBy('supplier_nama')->get(); // Get supplier data
+
+        // Load Excel library
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); // Get active sheet
+
+        // Set headers for Excel sheet
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Kode Supplier');
+        $sheet->setCellValue('C1', 'Nama Supplier');
+        $sheet->setCellValue('D1', 'Alamat Supplier');
+
+        // Bold the headers
+        $sheet->getStyle('A1:D1')->getFont()->setBold(true);
+
+        // Populate the sheet with data
+        $no = 1;
+        $row = 2;
+        foreach ($suppliers as $key => $supplier) {
+            $sheet->setCellValue('A' . $row, $no);
+            $sheet->setCellValue('B' . $row, $supplier->supplier_kode);
+            $sheet->setCellValue('C' . $row, $supplier->supplier_nama);
+            $sheet->setCellValue('D' . $row, $supplier->supplier_alamat);
+            $row++;
+            $no++;
+        }
+
+        // Auto size the columns
+        foreach (range('A', 'D') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        $sheet->setTitle('Data Supplier');
+
+        // Create Excel file and prompt download
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Supplier ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+        $writer->save('php://output');
+        exit;
+    }
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                // Validate file must be xlsx and max 1MB
+                'file_supplier' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation Failed',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $file = $request->file('file_supplier'); // Get file from request
+            $reader = IOFactory::createReader('Xlsx'); // Load excel file reader
+            $reader->setReadDataOnly(true); // Only read data
+            $spreadsheet = $reader->load($file->getRealPath()); // Load the excel file
+            $sheet = $spreadsheet->getActiveSheet(); // Get active sheet
+            $data = $sheet->toArray(null, false, true, true); // Fetch data from excel
+            $insert = [];
+
+            if (count($data) > 1) { // If data has more than 1 row
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // Skip the header (first row)
+                        $insert[] = [
+                            'supplier_kode' => $value['A'],
+                            'supplier_nama' => $value['B'],
+                            'supplier_alamat' => $value['C'],
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+                if (count($insert) > 0) {
+                    // Insert data into database, ignore duplicates
+                    SupplierModel::insertOrIgnore($insert);
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data successfully imported'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No data to import'
+                ]);
+            }
+        }
+        return redirect('/');
     }
 }

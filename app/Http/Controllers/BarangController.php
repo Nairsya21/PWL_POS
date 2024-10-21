@@ -175,6 +175,15 @@ class BarangController extends Controller
         $kategori = KategoriModel::select('kategori_id', 'kategori_nama')->get();
         return view('barang.create_ajax')->with('kategori', $kategori);
     }
+    public function show_ajax(Request $request, string $id)
+    {
+        $barang = BarangModel::find($id);
+
+        if (!$barang) {
+            return response()->json(['status' => false, 'message' => 'barang not found'], 404);
+        }
+        return view('barang.show_ajax', compact('barang'));
+    }
 
     // Store a newly created item via AJAX
     public function store_ajax(Request $request)

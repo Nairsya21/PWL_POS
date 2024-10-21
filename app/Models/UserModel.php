@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+
 
 class UserModel extends Authenticatable
 {
@@ -26,6 +28,10 @@ class UserModel extends Authenticatable
     public function profil(): HasOne
     {
         return $this->hasOne(ProfilUserModel::class, 'user_id', 'user_id');
+    }
+    public function stok(): HasMany
+    {
+        return $this->hasMany(StokModel::class, 'user_id', 'user_id');
     }
 
     public function getRoleName(): string
