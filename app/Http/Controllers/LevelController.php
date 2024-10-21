@@ -7,6 +7,8 @@ use App\Models\LevelModel;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 class LevelController extends Controller
 {
@@ -150,6 +152,20 @@ class LevelController extends Controller
     {
         return view('level.create_ajax');
     }
+    public function show_ajax(string $id)
+    {
+        // Mencari data level berdasarkan id
+        $level = LevelModel::findOrFail($id);
+
+        // Jika data level tidak ditemukan, akan mengembalikan response dengan error
+        if (!$level) {
+            return response()->json(['error' => 'Data level tidak ditemukan'], 404);
+        }
+
+        // Mengembalikan view untuk ditampilkan di modal menggunakan Ajax
+        return view('level.show_ajax', compact('level'));
+    }
+
 
     // Menyimpan data level baru melalui Ajax
     public function store_ajax(Request $request)
@@ -272,5 +288,106 @@ class LevelController extends Controller
         $pdf->render();
 
         return $pdf->stream('Data level ' . date('Y-m-d H:i:s') . 'pdf');
+    }
+    public function import()
+    {
+        return view('level.import');
+    }
+    public function import_ajax(Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                // Validate file must be xlsx and max 1MB
+                'file_level' => ['required', 'mimes:xlsx', 'max:1024']
+            ];
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation Failed',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $file = $request->file('file_level'); // Get file from request
+            $reader = IOFactory::createReader('Xlsx'); // Load excel file reader
+            $reader->setReadDataOnly(true); // Only read data
+            $spreadsheet = $reader->load($file->getRealPath()); // Load the excel file
+            $sheet = $spreadsheet->getActiveSheet(); // Get active sheet
+            $data = $sheet->toArray(null, false, true, true); // Fetch data from excel
+            $insert = [];
+
+            if (count($data) > 1) { // If data has more than 1 row
+                foreach ($data as $baris => $value) {
+                    if ($baris > 1) { // Skip the header (first row)
+                        $insert[] = [
+                            'level_nama' => $value['A'],
+                            'created_at' => now(),
+                        ];
+                    }
+                }
+                if (count($insert) > 0) {
+                    // Insert data into database, ignore duplicates
+                    LevelModel::insertOrIgnore($insert);
+                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data successfully imported'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'No data to import'
+                ]);
+            }
+        }
+        return redirect('/');
+    }
+
+    public function export_excel()
+    {
+        $levels = LevelModel::orderBy('level_nama')->get(); // Get level data
+
+        // Load Excel library
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet(); // Get active sheet
+
+        // Set headers for Excel sheet
+        $sheet->setCellValue('A1', 'No');
+        $sheet->setCellValue('B1', 'Nama Level');
+
+        // Bold the headers
+        $sheet->getStyle('A1:B1')->getFont()->setBold(true);
+
+        // Populate the sheet with data
+        $no = 1;
+        $row = 2;
+        foreach ($levels as $key => $level) {
+            $sheet->setCellValue('A' . $row, $no);
+            $sheet->setCellValue('B' . $row, $level->level_nama);
+            $row++;
+            $no++;
+        }
+
+        // Auto size the columns
+        foreach (range('A', 'B') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+        $sheet->setTitle('Data Level');
+
+        // Create Excel file and prompt download
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $filename = 'Data Level ' . date('Y-m-d H:i:s') . '.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+        header('Cache-Control: max-age=1');
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: cache, must-revalidate');
+        header('Pragma: public');
+        $writer->save('php://output');
+        exit;
     }
 }

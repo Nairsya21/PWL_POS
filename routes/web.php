@@ -74,8 +74,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/edit_ajax', [LevelController::class, 'edit_ajax']);  //menampilkan halaman form edit Level Ajax
         Route::put('/{id}/update_ajax', [LevelController::class, 'update_ajax']);  //Menyimpan halaman form edit Level Ajax
         Route::get('/{id}/delete_ajax', [LevelController::class, 'confirm_ajax']);  //tampilan form confirm delete Level Ajax
+        Route::get('/{id}/show_ajax', [LevelController::class, 'show_ajax']);  //tampilan form confirm show Level Ajax
         Route::delete('/{id}/delete_ajax', [LevelController::class, 'delete_ajax']); //menghapus data Level Ajax
         Route::get('/export_pdf', [LevelController::class, 'export_pdf']);  //export pdf
+        Route::get('/import', [BarangController::class, 'import']);  //ajax form upload excel
+        Route::post('/import_ajax', [LevelController::class, 'import_ajax']);  //ajax import excel
+        Route::get('/export_excel', [LevelController::class, 'export_excel']);  //export excel
 
         Route::get('/{id}', [LevelController::class, 'show']);       //menampilkan detail Level
         Route::get('/{id}/edit', [LevelController::class, 'edit']);  //menampilkan halaman form detail Level
