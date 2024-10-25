@@ -18,7 +18,7 @@
                     <div class="form-group form-group-sm row text-sm mb-0">
                         <label for="filter_date" class="col-md-1 col-form-label">Filter</label>
                         <div class="col-md-3">
-                            <select name="filter_kategori" class="form-control form-control-sm filter_kategori">
+                            <select class="form-control" id="kategori_id" name="kategori_id" required>
                                 <option value="">- Semua -</option>
                                 @foreach($kategori as $l)
                                 <option value="{{ $l->kategori_id }}">{{ $l->kategori_nama }}</option>
@@ -67,14 +67,13 @@
     var tableBarang;
     $(document).ready(function() {
         tableBarang = $('#table-barang').DataTable({
-            processing: true,
             serverSide: true,
             ajax: {
                 "url": "{{ url('barang/list') }}",
                 "dataType": "json",
                 "type": "POST",
                 "data": function(d) {
-                    d.filter_kategori = $('.filter_kategori').val();
+                    d.kategori_id = $('#kategori_id').val();
                 }
             },
             columns: [{
@@ -127,13 +126,8 @@
                 searchable: false
             }]
         });
-        $('#table-barang_filter input').unbind().bind().on('keyup', function(e) {
-            if (e.keyCode == 13) { // enter key
-                tableBarang.search(this.value).draw();
-            }
-        });
-        $('.filter_kategori').change(function() {
-            tableBarang.draw();
+        $('#kategori_id').on('change', function() {
+            tableBarang.ajax.reload();
         });
     });
 </script>

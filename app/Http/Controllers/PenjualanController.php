@@ -26,8 +26,9 @@ class PenjualanController extends Controller
         ];
         $activeMenu = 'penjualan'; // Set menu yang sedang aktif
         $users = UserModel::all();
+        $penjualan = PenjualanModel::all();
 
-        return view('penjualan.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'users' => $users, 'activeMenu' => $activeMenu]);
+        return view('penjualan.index', ['breadcrumb' => $breadcrumb, 'page' => $page, 'users' => $users, 'penjualan' => $penjualan, 'activeMenu' => $activeMenu]);
     }
 
     // Ambil data penjualan dalam bentuk JSON untuk DataTables

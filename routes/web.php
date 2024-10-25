@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\DetailPenjualanController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StokController;
 use Illuminate\Support\Facades\Route;
@@ -218,6 +219,32 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{id}/edit', [PenjualanController::class, 'edit']);  //menampilkan halaman form detail Penjualan
         Route::put('/{id}', [PenjualanController::class, 'update']);     //menyimpan perubahan data Penjualan
         Route::delete('/{id}', [PenjualanController::class, 'destroy']); //menghapus data Penjualan
+
+
+
+    });
+    Route::group(['prefix' => 'detailpenjualan', 'middleware' => 'authorize:ADM,MNG,STF'], function () {
+        Route::get('/', [DetailPenjualanController::class, 'index']);          //menampilkan halaman awal Penjualan
+        Route::post('/list', [DetailPenjualanController::class, 'list']);      //menampilkan data Penjualan dalam bentuk json untuk datatables
+        Route::get('/create', [DetailPenjualanController::class, 'create']);   //menammpilkan halaman form tambah Penjualan
+        Route::post('/', [DetailPenjualanController::class, 'store']);         //menyimpan data Penjualan baru
+
+        Route::get('/create_ajax', [DetailPenjualanController::class, 'create_ajax']);  //menampilkan halaman form tambah Penjualan Ajax
+        Route::post('/ajax', [DetailPenjualanController::class, 'store_ajax']);         //menyimpan data Penjualan baru Ajax
+        Route::get('/{id}/edit_ajax', [DetailPenjualanController::class, 'edit_ajax']);  //menampilkan halaman form edit Penjualan Ajax
+        Route::put('/{id}/update_ajax', [DetailPenjualanController::class, 'update_ajax']);  //Menyimpan halaman form edit Penjualan Ajax
+        Route::get('/{id}/delete_ajax', [DetailPenjualanController::class, 'confirm_ajax']);  //tampilan form confirm delete Penjualan Ajax
+        Route::delete('/{id}/delete_ajax', [DetailPenjualanController::class, 'delete_ajax']); //menghapus data Penjualan Ajax
+        Route::get('/{id}/show_ajax', [DetailPenjualanController::class, 'show_ajax']);
+        Route::get('/export_pdf', [DetailPenjualanController::class, 'export_pdf']);  //export pdf
+        Route::get('/import', [DetailPenjualanController::class, 'import']);  //ajax form upload excel
+        Route::post('/import_ajax', [DetailPenjualanController::class, 'import_ajax']);  //ajax import excel
+        Route::get('/export_excel', [DetailPenjualanController::class, 'export_excel']);  //export excel
+
+        Route::get('/{id}', [DetailPenjualanController::class, 'show']);       //menampilkan detail Penjualan
+        Route::get('/{id}/edit', [DetailPenjualanController::class, 'edit']);  //menampilkan halaman form detail Penjualan
+        Route::put('/{id}', [DetailPenjualanController::class, 'update']);     //menyimpan perubahan data Penjualan
+        Route::delete('/{id}', [DetailPenjualanController::class, 'destroy']); //menghapus data Penjualan
 
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use App\Models\StokModel;
@@ -417,12 +418,28 @@ class StokController extends Controller
             if (count($data) > 1) {
                 foreach ($data as $baris => $value) {
                     if ($baris > 1) { // Skip header row
+                        $excelDate = $value['C']; // Raw date value from Excel
+
+                        // Check if the date is a numeric Excel serial date
+                        if (is_numeric($excelDate)) {
+                            // Convert Excel serial date to a Unix timestamp and format as Y-m-d H:i:s
+                            $unixDate = ($excelDate - 25569) * 86400; // Excel serial date to Unix timestamp conversion
+                            $formattedDate = Carbon::createFromTimestamp($unixDate)->format('Y-m-d H:i:s');
+                        } else {
+                            // Attempt to parse the date if it's a normal string date format
+                            try {
+                                $formattedDate = Carbon::parse($excelDate)->format('Y-m-d H:i:s');
+                            } catch (\Exception $e) {
+                                // If the date format is invalid, you can handle it here (e.g., set to null or skip)
+                                $formattedDate = null;
+                            }
+                        }
                         $insert[] = [
-                            'supplier_id' => SupplierModel::where('supplier_nama', $value['C'])->first()->supplier_id,
-                            'barang_id' => BarangModel::where('barang_nama', $value['B'])->first()->barang_id,
+                            'barang_id' => $value['A'],
+                            'supplier_id' => $value['B'],
                             'user_id' => auth()->user()->user_id, // Assuming the logged-in user is adding the stock
-                            'stok_tanggal' => $value['F'],
-                            'stok_jumlah' => $value['G'],
+                            'stok_tanggal' => $formattedDate,
+                            'stok_jumlah' => $value['D'],
                             'created_at' => now(),
                         ];
                     }

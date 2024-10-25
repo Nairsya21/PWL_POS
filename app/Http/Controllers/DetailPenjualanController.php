@@ -18,39 +18,38 @@ class DetailPenjualanController extends Controller
             'title' => 'Detail Penjualan',
             'list' => ['Home', 'Penjualan', 'Detail Penjualan']
         ];
-        $penjualan = PenjualanModel::findOrFail($id);
+        $penjualan = PenjualanModel::all();
+        $detailpenjualan = DetailPenjualanModel::all();
         $barang = BarangModel::all();
         $page = (object) [
-            'title' => 'Detail Penjualan dari Transaksi ' . $penjualan->penjualan_kode
+            'title' => 'Detail Penjualan dari Transaksi '
         ];
-        $activeMenu = 'penjualan'; // Set menu yang sedang aktif
+        $activeMenu = 'detailpenjualan'; // Set menu yang sedang aktif
 
-        // Mengambil detail penjualan berdasarkan penjualan_id
-        $details = DetailPenjualanModel::where('penjualan_id', $id)->with('barang')->get();
 
         return view('detailpenjualan.index', [
             'breadcrumb' => $breadcrumb,
             'page' => $page,
             'barang' => $barang,
             'penjualan' => $penjualan,
+            'detailpenjualan' => $detailpenjualan,
             'activeMenu' => $activeMenu
         ]);
     }
 
     // List Detail Penjualan berdasarkan penjualan_id
-    public function list(string $id)
+    public function list()
     {
-        $details = DetailPenjualanModel::where('penjualan_id', $id)->with('barang')->get();
-
-        // Mengembalikan data untuk DataTables
+        $details = DetailPenjualanModel::with(['barang', 'penjualan'])->select('detail_id', 'penjualan_id', 'barang_id', 'harga', 'jumlah');
         return DataTables::of($details)
-            ->addIndexColumn()  // Menambahkan nomor urut otomatis
-            ->addColumn('aksi', function ($detail) {
-                $btn  = '<button onclick="modalAction(\'' . url('/penjualan/detail/' . $detail->detail_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                $btn .= '<button onclick="modalAction(\'' . url('/penjualan/detail/' . $detail->detail_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+            ->addIndexColumn()
+            ->addColumn('aksi', function ($details) {
+                $btn  = '<button onclick="modalAction(\'' . url('/detail/' . $details->detail_id . '/show_ajax') . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/detail/' . $details->detail_id . '/edit_ajax') . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . url('/detail/' . $details->detail_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
-            ->rawColumns(['aksi'])  // Mengizinkan HTML di kolom aksi
+            ->rawColumns(['aksi'])
             ->make(true);
     }
 

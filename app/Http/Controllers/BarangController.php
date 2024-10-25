@@ -34,7 +34,7 @@ class BarangController extends Controller
         $barangs = BarangModel::with('kategori')->select('barang_id', 'barang_kode', 'barang_nama', 'harga_beli', 'harga_jual', 'kategori_id');
 
         // Jika kategori_id ada dalam permintaan, filter berdasarkan kategori
-        if ($request->has('kategori_id') && $request->kategori_id != '') {
+        if ($request->kategori_id) {
             $barangs->where('kategori_id', $request->kategori_id);
         }
 

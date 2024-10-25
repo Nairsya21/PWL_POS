@@ -322,6 +322,7 @@ class LevelController extends Controller
                     if ($baris > 1) { // Skip the header (first row)
                         $insert[] = [
                             'level_nama' => $value['A'],
+                            'level_kode' => $value['B'],
                             'created_at' => now(),
                         ];
                     }
