@@ -11,8 +11,10 @@ use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\DetailPenjualanController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StokController;
+use App\Models\BarangModel;
 use Illuminate\Support\Facades\Route;
 use Monolog\Level;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +39,10 @@ use Monolog\Level;
 // Route::put('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
 // Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
+Route::get('/test-log', function () {
+    Log::info('Testing Laravel log');
+    return 'Check laravel.log';
+});
 Route::pattern('id', '[0-9]+');
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);
@@ -226,10 +232,10 @@ Route::middleware(['auth'])->group(function () {
     Route::group(['prefix' => 'detailpenjualan', 'middleware' => 'authorize:ADM,MNG,STF'], function () {
         Route::get('/', [DetailPenjualanController::class, 'index']);          //menampilkan halaman awal Penjualan
         Route::post('/list', [DetailPenjualanController::class, 'list']);      //menampilkan data Penjualan dalam bentuk json untuk datatables
-        Route::get('/create', [DetailPenjualanController::class, 'create']);   //menammpilkan halaman form tambah Penjualan
-        Route::post('/', [DetailPenjualanController::class, 'store']);         //menyimpan data Penjualan baru
 
         Route::get('/create_ajax', [DetailPenjualanController::class, 'create_ajax']);  //menampilkan halaman form tambah Penjualan Ajax
+        Route::get('/get-harga-barang/{id}', [DetailPenjualanController::class, 'getHargaBarang']);
+
         Route::post('/ajax', [DetailPenjualanController::class, 'store_ajax']);         //menyimpan data Penjualan baru Ajax
         Route::get('/{id}/edit_ajax', [DetailPenjualanController::class, 'edit_ajax']);  //menampilkan halaman form edit Penjualan Ajax
         Route::put('/{id}/update_ajax', [DetailPenjualanController::class, 'update_ajax']);  //Menyimpan halaman form edit Penjualan Ajax

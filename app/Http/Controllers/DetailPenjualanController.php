@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\DetailPenjualanModel;
 use App\Models\PenjualanModel;
@@ -51,6 +52,46 @@ class DetailPenjualanController extends Controller
             })
             ->rawColumns(['aksi'])
             ->make(true);
+    }
+    public function create_ajax()
+    {
+        $penjualans = PenjualanModel::all();
+        $barangs = BarangModel::all();
+        return view('detailpenjualan.create_ajax', ['penjualans' => $penjualans, 'barangs' => $barangs]);
+    }
+
+    public function getHargaBarang(string $id)
+    {
+        // Log ID barang yang diterima
+        Log::info('ID barang yang diterima:', ['id' => $id]);
+
+        $barang = BarangModel::find($id);
+
+        if ($barang) {
+            Log::info('Barang ditemukan:', ['harga' => $barang->harga_jual]);
+            return response()->json(['status' => true, 'harga' => $barang->harga_jual]);
+        } else {
+            Log::warning('Barang tidak ditemukan:', ['id' => $id]);
+            return response()->json(['status' => false, 'message' => 'Barang tidak ditemukan']);
+        }
+    }
+
+
+    public function show_ajax(string $id)
+    {
+        // Mengambil data penjualan berdasarkan id
+        $penjualan = PenjualanModel::findOrFail($id);
+
+        // Mengambil detail penjualan berdasarkan penjualan_id
+        $details = DetailPenjualanModel::where('penjualan_id', $id)->with('barang')->get();
+
+        // $barangs = BarangModel::find($details->barang_id);
+        // Mengirimkan data ke view untuk di-load menggunakan DataTables
+        return view('penjualan.show_ajax', [
+            'penjualan' => $penjualan,
+            // 'barangs' => $barangs,
+            'details' => $details
+        ]);
     }
 
     // Menambahkan Detail Penjualan baru via AJAX
