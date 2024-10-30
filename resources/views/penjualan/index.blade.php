@@ -19,11 +19,13 @@
             <div class="tab-content">
                 <!-- Tab for Data Penjualan -->
                 <div class="tab-pane fade show active" id="data-penjualan" role="tabpanel" aria-labelledby="data-penjualan-tab">
-                    <div class="card-tools mt-3">
-                        <button onclick="modalAction('{{ url('penjualan/import') }}')" class="btn btn-info">Import penjualan</button>
-                        <a href="{{ url('/penjualan/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i>Export penjualan</a>
-                        <a href="{{ url('/penjualan/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i>Export Penjualan</a>
-                        <button onclick="modalAction('{{ url('/penjualan/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                    <div class="card-tools mt-3 d-flex justify-content-end mb-2">
+                        <div class="btn-group mr-3">
+                            <button onclick="modalAction('{{ url('penjualan/import') }}')" class="btn btn-info">Import penjualan</button>
+                            <a href="{{ url('/penjualan/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i>Export penjualan</a>
+                            <a href="{{ url('/penjualan/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i>Export Penjualan</a>
+                            <button onclick="modalAction('{{ url('/penjualan/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                        </div>
                     </div>
                     @if (session('success'))
                     <div class="alert alert-success">{{ session('success') }}</div>
@@ -63,13 +65,14 @@
                 
                 <!-- Tab for Detail Penjualan -->
                 <div class="tab-pane fade" id="detail-penjualan" role="tabpanel" aria-labelledby="detail-penjualan-tab">
-                    <div class="card-tools mt-3">
-                        <button onclick="modalAction('{{ url('penjualan/import') }}')" class="btn btn-info">Import penjualan</button>
-                        <a href="{{ url('/penjualan/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i>Export penjualan</a>
-                        <a href="{{ url('/penjualan/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i>Export Penjualan</a>
-                        <button onclick="modalAction('{{ url('/detailpenjualan/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                    <div class="card-tools mt-3 d-flex justify-content-end mb-2">
+                        <div class="btn-group mr-3">
+                            <button onclick="modalAction('{{ url('detailpenjualan/import') }}')" class="btn btn-info">Import Detail</button>
+                            <a href="{{ url('/detailpenjualan/export_excel') }}" class="btn btn-primary"><i class="fa fa-file-excel"></i>Export Detail</a>
+                            <a href="{{ url('/detailpenjualan/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file-pdf"></i>Export Detail</a>
+                            <button onclick="modalAction('{{ url('/detailpenjualan/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah Ajax</button>
+                        </div>
                     </div>
-                    {{-- @include('penjualan.detailPenjualan_ajax') --}}
                     @if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
@@ -178,9 +181,9 @@
             dataPenjualan.ajax.reload();
         });
     }); 
-    var detailPenjualan;
+    var dataDetailPenjualan;
     $(document).ready(function() { 
-        detailPenjualan = $('#table-detail-penjualan').DataTable({
+        dataDetailPenjualan = $('#table-detail-penjualan').DataTable({
             serverSide: true,  
             autoWidth: false,  // Disable auto width calculation by DataTables
             responsive: true,     
@@ -189,7 +192,7 @@
                 "type": "POST", 
                 "dataType": "json",
                 "data": function(d) { // Send CSRF token with the request
-                    d.penjualan = $('#penjualan').val();
+                    d.penjualan_id = $('#penjualan_id').val();
                 }
             }, 
             columns: [ 
@@ -233,7 +236,7 @@
         }); 
 
         $('#penjualan_id').on('change', function() {
-            detailPenjualan.ajax.reload();
+            dataDetailPenjualan.ajax.reload();
         });
     }); 
 </script>

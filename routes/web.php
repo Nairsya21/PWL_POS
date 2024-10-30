@@ -39,10 +39,7 @@ use Illuminate\Support\Facades\Log;
 // Route::put('/user/ubah_simpan/{id}', [UserController::class, 'ubah_simpan']);
 // Route::get('/user/hapus/{id}', [UserController::class, 'hapus']);
 
-Route::get('/test-log', function () {
-    Log::info('Testing Laravel log');
-    return 'Check laravel.log';
-});
+
 Route::pattern('id', '[0-9]+');
 Route::get('login', [AuthController::class, 'login'])->name('login');
 Route::post('login', [AuthController::class, 'postlogin']);

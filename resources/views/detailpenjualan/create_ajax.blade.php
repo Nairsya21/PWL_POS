@@ -52,7 +52,7 @@
             let barangId = $(this).val();
             if (barangId) {
                 $.ajax({
-                    url: '/get-harga-barang/' + barangId,  // Endpoint untuk mengambil harga barang
+                    url: 'detailpenjualan/get-harga-barang/' + barangId,  // Endpoint untuk mengambil harga barang
                     type: 'GET',
                     success: function(response) {
                         if (response.status) {

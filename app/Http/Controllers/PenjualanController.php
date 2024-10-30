@@ -35,7 +35,10 @@ class PenjualanController extends Controller
     public function list(Request $request)
     {
         $penjualans = PenjualanModel::with('user')->select('penjualan_id', 'user_id', 'pembeli', 'penjualan_kode', 'penjualan_tanggal');
-
+        //Filter data penjualan berdasarkan user
+        if ($request->user_id) {
+            $penjualans->where('user_id', $request->user_id);
+        }
         return DataTables::of($penjualans)
             ->addIndexColumn()
             ->addColumn('aksi', function ($penjualan) {
@@ -169,15 +172,15 @@ class PenjualanController extends Controller
     {
         // Mengambil data penjualan berdasarkan id
         $penjualan = PenjualanModel::findOrFail($id);
+        $users = UserModel::find($penjualan->user_id);
 
         // Mengambil detail penjualan berdasarkan penjualan_id
         $details = DetailPenjualanModel::where('penjualan_id', $id)->with('barang')->get();
 
-        // $barangs = BarangModel::find($details->barang_id);
         // Mengirimkan data ke view untuk di-load menggunakan DataTables
         return view('penjualan.show_ajax', [
             'penjualan' => $penjualan,
-            // 'barangs' => $barangs,
+            'users' => $users,
             'details' => $details
         ]);
     }
