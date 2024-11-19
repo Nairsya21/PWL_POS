@@ -32,6 +32,12 @@
                     <th>Harga Jual</th> 
                     <td>{{ $barang->harga_jual }}</td> 
                 </tr> 
+                <tr> 
+                    <th>Image</th> 
+                    <td>
+                        <img src="{{ $barang->image }}" style="max-width: 200px; height: auto;">
+                    </td> 
+                </tr> 
                 <!-- Add more fields if necessary -->
             </table>
         </div>
@@ -57,6 +63,7 @@
                         $('#harga_beli').text(response.data.harga_beli);
                         $('#harga_jual').text(response.data.harga_jual);
                         $('#kategori_nama').text(response.data.kategori_nama);
+                        $('#image').html('<img src="/images/barang/' + response.data.image);
                         // Populate other fields as necessary
                     } else {
                         Swal.fire({
